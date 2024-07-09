@@ -25,7 +25,7 @@ async def main():
                 if parsed_list:
                     await insert_estates_tg(parsed_list)
 
-        print('parsing done')
+        print(f'parsing done - {count}')
         count += 1
         if count == dlt_old_msgs_every:
             await delete_old_msgs(delete_after_days)

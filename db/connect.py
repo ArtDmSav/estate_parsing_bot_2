@@ -86,7 +86,3 @@ async def delete_old_msgs(days):
             stmt = delete(Estate).where(Estate.datetime < threshold_date)
             await session.execute(stmt)
             await session.commit()
-
-    async with async_session() as session:
-        async with session.begin():
-            await session.execute("VACUUM")

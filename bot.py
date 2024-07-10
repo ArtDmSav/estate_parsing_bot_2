@@ -13,7 +13,7 @@ async def main():
     # Перенести константы в файл дата
     sleep = 60*10   # loop restart every 10 min
     dlt_old_msgs_every = 144    # sleep(10min) * 144 = 24h
-    delete_after_days = 2
+    delete_after_days = 30
 
     while True:
         # Укажите идентификатор чата или его username

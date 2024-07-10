@@ -1,11 +1,12 @@
-import re
 import asyncio
+import re
 from datetime import datetime
-
 from functools import partial
+
+from deep_translator import GoogleTranslator
+from deep_translator.exceptions import RequestError
 from langdetect import detect, DetectorFactory
 from langdetect.lang_detect_exception import LangDetectException
-from deep_translator import GoogleTranslator
 
 from db.msg4analysis import insert_unprocessed_message
 
@@ -183,18 +184,21 @@ async def translate_language(msg: str) -> tuple[str, str, str, str]:
 
     msg_language = await detect_language(msg)
 
-    match msg_language:
-        case 'ru':
-            msg_en = await translate_en('ru')
-            msg_el = await translate_el('ru')
-            return msg_language, msg, msg_en, msg_el
-        case 'en':
-            msg_ru = await translate_ru('en')
-            msg_el = await translate_el('en')
-            return msg_language, msg_ru, msg, msg_el
-        case 'el':
-            msg_en = await translate_en('el')
-            msg_ru = await translate_ru('el')
-            return msg_language, msg_ru, msg_en, msg
-        case _:
-            return '', '', '', ''
+    try:
+        match msg_language:
+            case 'ru':
+                msg_en = await translate_en('ru')
+                msg_el = await translate_el('ru')
+                return msg_language, msg, msg_en, msg_el
+            case 'en':
+                msg_ru = await translate_ru('en')
+                msg_el = await translate_el('en')
+                return msg_language, msg_ru, msg, msg_el
+            case 'el':
+                msg_en = await translate_en('el')
+                msg_ru = await translate_ru('el')
+                return msg_language, msg_ru, msg_en, msg
+            case _:
+                return '', '', '', ''
+    except RequestError:
+        pass

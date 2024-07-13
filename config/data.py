@@ -14,7 +14,7 @@ BOT_USERNAME = config['Telegram']['bot_username']
 USERNAME = config['Telegram']['username']
 API_ID = config['Telegram']['api_id']
 API_HASH = config['Telegram']['api_hash']
-DEL_MSG_AFTER_DAY = 30
+DEL_MSG_AFTER_DAY = 7
 TELEGRAM_GROUPS = (config['Telegram']['group_1'], config['Telegram']['group_2'], config['Telegram']['group_3'])
 
 

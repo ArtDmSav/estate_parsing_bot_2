@@ -103,6 +103,8 @@ async def price_parsing(msg: str) -> int:
         # Rewrite num in list without empty string
         first_numbers = [el_s for _ in first_search for el_s in _ if el_s != '']
         print(f'first_numbers {first_numbers}')
+    else:
+        return -1
     # Catch typecast error
     # If catch error we return result = -1, after we can identify this result (-1) like an error
     try:

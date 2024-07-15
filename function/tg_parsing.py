@@ -98,11 +98,9 @@ async def price_parsing(msg: str) -> int:
     # List with our keywords in tuple in list
     first_search = re.findall(r_str, msg)
 
-    print(first_search)
     if first_search:
         # Rewrite num in list without empty string
         first_numbers = [el_s for _ in first_search for el_s in _ if el_s != '']
-        print(f'first_numbers {first_numbers}')
     else:
         return -1
     # Catch typecast error

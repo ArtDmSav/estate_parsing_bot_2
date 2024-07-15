@@ -28,13 +28,13 @@ async def main_parsing(estates_list: list, group_id: str) -> list:
                 await insert_unprocessed_message(case='NO PRICE', msg=msg, url=f't.me/{group_id}/{estate.id}')
                 print(f'-------------PRICE DOESNT FIND --------------------!!!!!!!!!\nt.me/{group_id}/{estate.id}')
                 continue
-            language, msg_ru, msg_en, msg_el   = await translate_language(msg)
+            language, msg_ru, msg_en, msg_el = await translate_language(msg)
             if not language:
                 await insert_unprocessed_message(case='NO LANGUAGE', msg=msg, url=f't.me/{group_id}/{estate.id}')
                 print(f'-------------- LANGUAGE DOESNT FIND --------------------!!!!!!!!!\nt.me/{group_id}/{estate.id}')
                 continue
 
-            estate_dict['resource'] = 1     # 1 - Telegram, 2 - website
+            estate_dict['resource'] = 1  # 1 - Telegram, 2 - website
             estate_dict['datetime'] = dt
             estate_dict['city'] = await city_parsing(msg)
             estate_dict['group_id'] = group_id
@@ -61,7 +61,16 @@ async def rent_parsing(msg: str) -> bool:
 
 async def city_parsing(msg: str) -> str:
     # Write city name on 3 language (En, Gr[en transcription], Ru)
-    limassol = r"(л[ие]м[ао]сс?ол[ае]?)|(l[ie]m[ae]ss?o[ls])|(n[ei]ap[oa]lis)|(lim)|(лим)" #germasogeia
+    limassol = \
+        (r"(л[ие]м[ао]сс?ол[ае]?)|(l[ie]m[ae]ss?o[ls])|(n[ei]ap[oa]lis)|(lim)|(лим)|"
+         r"(\b[Nn][Ee]?[Aa]?[Pp][Aa]?[Oo]?[Ll][Ii][Ss][Ee]?[Ss]?\b)|(\b[Нн][Ее][Аа]?[Пп][Аа]?[Оо]?[Лл][Ии][Сс][Сс]?[Ее]?[Йй]?\b)|"
+         r"(\bagi?a? ?fy?l?i?a?\b)|(\bаги?я? ?ф[ийы]л?я?\b)|"
+         r"(г[еи]ра?м[аое]?с[ое]й?и?[оя]\b)|(germass?og[ei][aiye]?[ia]?\b)|"
+         r"(\bаг[ий]?ос ?т[иы]х[оа]н[ао]с\b)|(\bagios ?t[hy][ck]?[oi][nh]?[aons]{2,}\b)|"
+         r"(\bкат[ат]?[оа] ?пол[еи]м[еи]д[иы]?[яиа]\b)|(\bkat[ot]?[oa] ?pol[ei]m[ei]d[iy]?[aeia]\b)|"
+         r"(\bм[еи]с{1,2}[аи] ?г?[еи][тт][оа][нн][ия][ья]?\b)|(\bmes{1,2}a ?ge?[iie]t{1,2}on[yi][ai]?\b)|"
+         r"(\bз[ао]к{1,2}[ао]к{1,2}и[ий]?\b)|(zak{1,2}[ao]k{1,2}[iye]?\b)|"
+         r"(папас)|(papas)|(metro)|(мол[оа]сс?е?)")
     larnaka = r"(л[ао]рнак[ае])|(l[ae]r[nv]aka)"
     pafos = r"(паф[ао]сс?е?)|(paf[ao]ss?)"
     nikosiya = r"(н[ие]к[оа]сс?и[яи])|(n[ie]k[oa]ss?ia)|(lefkosa)"
@@ -79,34 +88,34 @@ async def city_parsing(msg: str) -> str:
 
 
 async def price_parsing(msg: str) -> int:
-    r_str = r"((price)?(евро)?(cтоимость)?(цена)?(в)?(за)?(аренд[аы])?(euro)?(eur)? ?(мес)?(месяц)?[€\-💶💴:/]? ?" \
+    r_str = r"((💵)?(price)?(евро)?(cтоимость)?(цена)?(в)?(за)?(аренд[аы])?(euro)?(eur)? ?(мес)?(месяц)?[€\-💶💴:/]? ?" \
             r"\d{1,3}[\.',\s]?\d{3}" \
-            r" ?(price)?(евро)?(euro)?(eur)?[€\-💶💴:/]?(cтоимость)?(цена)? ?(в)?(за)?(аренд[аы])? ?(мес)?(месяц)?)" \
-            r"|((price)?(евро)?(cтоимость)?(цена)?(в)?(за)?(аренд[аы])?(euro)?(eur)? ?(мес)?(месяц)?[€\-💶💴:/]? ?" \
+            r" ?(💵)?(price)?(евро)?(euro)?(eur)?[€\-💶💴:/]?(cтоимость)?(цена)? ?(в)?(за)?(аренд[аы])? ?(мес)?(месяц)?)" \
+            r"|((💵)?(price)?(евро)?(cтоимость)?(цена)?(в)?(за)?(аренд[аы])?(euro)?(eur)? ?(мес)?(месяц)?[€\-💶💴:/]? ?" \
             r"\d{3}" \
-            r" ?(price)?(евро)?(euro)?(eur)?[€\-💶💴:/]?(cтоимость)?(цена)? ?(в)?(за)?(аренд[аы])? ?(мес)?(месяц)?)"
+            r" ?(💵)?(price)?(евро)?(euro)?(eur)?[€\-💶💴:/]?(cтоимость)?(цена)? ?(в)?(за)?(аренд[аы])? ?(мес)?(месяц)?)"
 
     # List with our keywords in tuple in list
     first_search = re.findall(r_str, msg)
 
-    # Rewrite num in list without empty string
-    first_numbers = [el_s for _ in first_search for el_s in _ if el_s != '']
-
+    print(first_search)
+    if first_search:
+        # Rewrite num in list without empty string
+        first_numbers = [el_s for _ in first_search for el_s in _ if el_s != '']
+        print(f'first_numbers {first_numbers}')
     # Catch typecast error
     # If catch error we return result = -1, after we can identify this result (-1) like an error
     try:
-        return int(clean_price(first_numbers))
+        return clean_price(first_numbers)
     except ValueError:
         return -1
-
-    # Second clean price search
 
 
 def clean_price(first_number):
     re_clean_price = r"(\d{1,3}[\.',\s]?\d{3})|(\d{3})"
     flag = True
     second_number = []
-    trig_w = ["евро", "euro", "eur", "€", "💶", "💴", "price", "цена", "cтоимость"]
+    trig_w = ["евро", "euro", "eur", "€", "💶", "💵", "💴", "price", "цена", "cтоимость"]
     result = []
     for string in first_number:
         for key_w in trig_w:

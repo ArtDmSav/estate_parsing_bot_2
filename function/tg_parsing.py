@@ -4,7 +4,7 @@ from datetime import datetime
 from functools import partial
 
 from deep_translator import GoogleTranslator
-from deep_translator.exceptions import RequestError
+from deep_translator.exceptions import RequestError, TranslationNotFound
 from langdetect import detect, DetectorFactory
 from langdetect.lang_detect_exception import LangDetectException
 
@@ -199,16 +199,32 @@ async def translate_language(msg: str) -> tuple[str, str, str, str]:
     try:
         match msg_language:
             case 'ru':
-                msg_en = await translate_en('ru')
-                msg_el = await translate_el('ru')
+                try:
+                    msg_en = await translate_en('ru')
+                    msg_el = await translate_el('ru')
+                except TranslationNotFound:
+                    await asyncio.sleep(60)
+                    msg_en = await translate_en('ru')
+                    msg_el = await translate_el('ru')
                 return msg_language, msg, msg_en, msg_el
             case 'en':
-                msg_ru = await translate_ru('en')
-                msg_el = await translate_el('en')
+                try:
+                    msg_ru = await translate_ru('en')
+                    msg_el = await translate_el('en')
+                except TranslationNotFound:
+                    await asyncio.sleep(60)
+                    msg_ru = await translate_ru('en')
+                    msg_el = await translate_el('en')
                 return msg_language, msg_ru, msg, msg_el
             case 'el':
-                msg_en = await translate_en('el')
-                msg_ru = await translate_ru('el')
+                try:
+                    msg_en = await translate_en('el')
+                    msg_ru = await translate_ru('el')
+                except TranslationNotFound:
+                    await asyncio.sleep(60)
+                    msg_en = await translate_en('el')
+                    msg_ru = await translate_ru('el')
+
                 return msg_language, msg_ru, msg_en, msg
             case _:
                 return '', '', '', ''

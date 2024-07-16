@@ -172,9 +172,13 @@ async def translate_language(msg: str) -> tuple[str, str, str, str]:
             # Определяем язык
             lang_code = detect(msg)
             return lang_code
-        except LangDetectException as e:
-            print(e)
-            return ''
+        except LangDetectException:
+            try:
+                lang_code = detect(msg[:len(msg) / 2])
+                return lang_code
+            except LangDetectException as e:
+                print(e)
+                return ''
 
     async def translate_ru(src: str, msg: str = msg, dest: str = 'ru') -> str:
         loop = asyncio.get_event_loop()

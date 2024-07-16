@@ -72,7 +72,7 @@ async def city_parsing(msg: str) -> str:
          r"(\bз[ао]к{1,2}[ао]к{1,2}и[ий]?\b)|(zak{1,2}[ao]k{1,2}[iye]?\b)|"
          r"(папас)|(papas)|(metro)|(мол[оа]сс?е?)")
     larnaka = r"(л[ао]рнак[ае])|(l[ae]r[nv]aka)"
-    pafos = r"(паф[ао]сс?е?)|(paf[ao]ss?)"
+    pafos = r"(паф[ао]сс?е?)|(paf[ao]ss?)|(paphos)"
     nikosiya = r"(н[ие]к[оа]сс?и[яи])|(n[ie]k[oa]ss?ia)|(lefkosa)"
 
     if re.search(limassol, msg, re.IGNORECASE):
@@ -111,7 +111,7 @@ async def price_parsing(msg: str) -> int:
         return -1
 
 
-def clean_price(first_number):
+def clean_price(first_number: list) -> int:
     re_clean_price = r"(\d{1,3}[\.',\s]?\d{3})|(\d{3})"
     flag = True
     second_number = []
@@ -135,7 +135,10 @@ def clean_price(first_number):
                             break
                     if flag_2:
                         result.append(elem)
-                return result[0]
+                try:
+                    return int(result[0])
+                except (IndexError, ValueError):
+                    return -1
 
     # If we can't find match with list 'trig_w', we start finding price in first search list
     if flag:
@@ -156,8 +159,8 @@ def clean_price(first_number):
         if not result:
             return -1
         try:
-            return result[0]
-        except IndexError:
+            return int(result[0])
+        except (IndexError, ValueError):
             return -1
 
 

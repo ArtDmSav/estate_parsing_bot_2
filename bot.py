@@ -21,11 +21,11 @@ async def main():
                 if parsed_list:
                     await insert_estates_tg(parsed_list)
 
-        print(f'parsing done - {count}\n{datetime.now()}')
+        print(f'parsing done - {datetime.now()}\n')
         count += 1
         if count == CHECK_FOR_DEL_MSG_TIME:
             await delete_old_msgs(DEL_MSG_AFTER_DAY)
-            print('delete_old_msgs(delete_after_days)-------------')
+            print('delete_old_msgs\n')
             count = 0
         await asyncio.sleep(LOOP_SLEEP)
 

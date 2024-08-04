@@ -18,11 +18,7 @@ async def estates_telegram_list(chat_id: str, start_msg_id: int) -> list:
         # Итерация по сообщениям с учетом лимитов
         async for message in client.iter_messages(f't.me/{chat_id}', limit=100):
             all_messages.append(message)
-        print(f'Получено {len(all_messages)} сообщений')
-        #
-        # # Обработка сообщений (например, вывод на экран)
-        # for message in all_messages:
-        #     print(message.sender_id, message.text)
+        print(f'Получено {len(all_messages)} сообщений\n')
 
         return all_messages
     except errors.FloodWaitError as e:

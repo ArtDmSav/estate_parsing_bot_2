@@ -14,8 +14,6 @@ async def is_it_dublicate(msgs, estate_obj) -> bool:
 
         # Преобразование текстов в TF-IDF векторы
         tfidf_matrix = vectorizer.fit_transform([msg, estate_obj['msg']])
-        # print(f'is_it_dublicate estate_obj[msg] = {estate_obj["msg"]} \n\n')
-        # print(f'is_it_dublicate msg = {msg}')
 
         # Вычисление косинусного сходства
         similarity_matrix = cosine_similarity(tfidf_matrix)

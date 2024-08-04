@@ -4,7 +4,7 @@ from datetime import datetime
 from functools import partial
 
 from deep_translator import GoogleTranslator
-from deep_translator.exceptions import RequestError, TranslationNotFound, TooManyRequests
+from deep_translator.exceptions import TranslationNotFound, TooManyRequests
 from langdetect import detect, DetectorFactory
 from langdetect.lang_detect_exception import LangDetectException
 
@@ -26,12 +26,12 @@ async def main_parsing(estates_list: list, group_id: str) -> list:
             estate_dict['price'] = await price_parsing(msg)
             if estate_dict['price'] == -1:
                 await insert_unprocessed_message(case='NO PRICE', msg=msg, url=f't.me/{group_id}/{estate.id}')
-                print(f'-------------PRICE DOESNT FIND --------------------!!!!!!!!!\nt.me/{group_id}/{estate.id}')
+                print(f'-------------PRICE DOESNT FIND -------------------- t.me/{group_id}/{estate.id}\n')
                 continue
             language, msg_ru, msg_en, msg_el = await translate_language(msg)
             if not language:
                 await insert_unprocessed_message(case='NO LANGUAGE', msg=msg, url=f't.me/{group_id}/{estate.id}')
-                print(f'-------------- LANGUAGE DOESNT FIND --------------------!!!!!!!!!\nt.me/{group_id}/{estate.id}')
+                print(f'-------------- LANGUAGE DOESNT FIND -------------------- t.me/{group_id}/{estate.id}\n')
                 continue
 
             estate_dict['resource'] = 1  # 1 - Telegram, 2 - website
@@ -47,7 +47,7 @@ async def main_parsing(estates_list: list, group_id: str) -> list:
             estate_dict['msg_el'] = msg_el
 
             if estate_dict['city'] == "cyprus":
-                print(f'----------- DOESNT FIND CITY ---------------------- \nt.me/{group_id}/{estate.id}')
+                print(f'----------- DOESNT FIND CITY ---------------------- t.me/{group_id}/{estate.id}\n')
                 await insert_unprocessed_message(case='NO FOUND CITY', msg=msg, url=f't.me/{group_id}/{estate.id}')
 
             parsing_estates.append(estate_dict)
@@ -108,6 +108,7 @@ async def price_parsing(msg: str) -> int:
     try:
         return clean_price(first_numbers)
     except ValueError:
+        print('error price_parsing: ', ValueError)
         return -1
 
 
@@ -137,7 +138,8 @@ def clean_price(first_number: list) -> int:
                         result.append(elem)
                 try:
                     return int(result[0])
-                except (IndexError, ValueError):
+                except (IndexError, ValueError) as e:
+                    print(f'error clean_price: {e}')
                     return -1
 
     # If we can't find match with list 'trig_w', we start finding price in first search list
@@ -160,7 +162,8 @@ def clean_price(first_number: list) -> int:
             return -1
         try:
             return int(result[0])
-        except (IndexError, ValueError):
+        except (IndexError, ValueError) as e:
+            print(f'error 2 clean_price: {e}')
             return -1
 
 
@@ -177,7 +180,7 @@ async def translate_language(msg: str) -> tuple[str, str, str, str]:
                 lang_code = detect(msg[:len(msg) / 2])
                 return lang_code
             except LangDetectException as e:
-                print(e)
+                print('detect_language error: ', e)
                 return ''
 
     async def translate_ru(src: str, msg: str = msg, dest: str = 'ru') -> str:
@@ -247,5 +250,5 @@ async def translate_language(msg: str) -> tuple[str, str, str, str]:
                 return msg_language, msg_ru, msg_en, msg
             case _:
                 return '', '', '', ''
-    except RequestError:
-        pass
+    except Exception as e:
+        print('error match msg_language: ', e)

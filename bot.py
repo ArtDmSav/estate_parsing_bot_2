@@ -1,7 +1,7 @@
 import asyncio
 from datetime import datetime
 
-from config.data import TELEGRAM_GROUPS
+from config.data import TELEGRAM_GROUPS, CHECK_FOR_DEL_MSG_TIME, DEL_MSG_AFTER_DAY, LOOP_SLEEP
 from db.connect import insert_estates_tg, get_last_msg_id, delete_old_msgs
 from function.tg_parsing import main_parsing
 from function.tg_request import estates_telegram_list
@@ -9,11 +9,6 @@ from function.tg_request import estates_telegram_list
 
 async def main():
     count = 143
-
-    # Перенести константы в файл дата
-    sleep = 60*10   # loop restart every 10 min
-    dlt_old_msgs_every = 144    # sleep(10min) * 144 = 24h
-    delete_after_days = 30
 
     while True:
         # Укажите идентификатор чата или его username
@@ -28,11 +23,11 @@ async def main():
 
         print(f'parsing done - {count}\n{datetime.now()}')
         count += 1
-        if count == dlt_old_msgs_every:
-            await delete_old_msgs(delete_after_days)
+        if count == CHECK_FOR_DEL_MSG_TIME:
+            await delete_old_msgs(DEL_MSG_AFTER_DAY)
             print('delete_old_msgs(delete_after_days)-------------')
             count = 0
-        await asyncio.sleep(sleep)
+        await asyncio.sleep(LOOP_SLEEP)
 
 try:
     asyncio.run(main())

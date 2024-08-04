@@ -1,5 +1,4 @@
 import configparser
-# import sentry_sdk
 from pathlib import Path
 
 # Absolut path
@@ -15,18 +14,6 @@ USERNAME = config['Telegram']['username']
 API_ID = config['Telegram']['api_id']
 API_HASH = config['Telegram']['api_hash']
 DEL_MSG_AFTER_DAY = 7
+LOOP_SLEEP = 60 * 10  # loop restart every 10 min
+CHECK_FOR_DEL_MSG_TIME = 144  # sleep(10min) * 144 = 24h
 TELEGRAM_GROUPS = (config['Telegram']['group_1'], config['Telegram']['group_2'], config['Telegram']['group_3'])
-
-
-# Sentry
-# sentry_sdk.init(
-#     dsn="https://76c87c124566bc8a80985c0f5fdcc933@o4505862236078080.ingest.sentry.io/4505879335927808",
-#     # Set traces_sample_rate to 1.0 to capture 100%
-#     # of transactions for performance monitoring.
-#     # We recommend adjusting this value in production.
-#     traces_sample_rate=1.0,
-#     # Set profiles_sample_rate to 1.0 to profile 100%
-#     # of sampled transactions.
-#     # We recommend adjusting this value in production.
-#     profiles_sample_rate=1.0,
-# )

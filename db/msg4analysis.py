@@ -36,4 +36,4 @@ async def insert_unprocessed_message(case, msg='', msg_2='', url=''):
                 await session.commit()
             except IntegrityError:
                 await session.rollback()
-                print(f"Запись с такими данными уже существует: url={url}")
+                print(f"Запись с такими данными уже существует: url={url}\n")

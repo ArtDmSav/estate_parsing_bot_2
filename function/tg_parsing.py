@@ -4,7 +4,7 @@ from datetime import datetime
 from functools import partial
 
 from deep_translator import GoogleTranslator
-from deep_translator.exceptions import RequestError, TranslationNotFound
+from deep_translator.exceptions import RequestError, TranslationNotFound, TooManyRequests
 from langdetect import detect, DetectorFactory
 from langdetect.lang_detect_exception import LangDetectException
 
@@ -181,22 +181,37 @@ async def translate_language(msg: str) -> tuple[str, str, str, str]:
                 return ''
 
     async def translate_ru(src: str, msg: str = msg, dest: str = 'ru') -> str:
-        loop = asyncio.get_event_loop()
-        translate_partial = partial(GoogleTranslator(src, dest).translate, msg)
-        msg_ru = await loop.run_in_executor(None, translate_partial)
-        return f'{msg_ru}\n\n____________________________\nПереведено с помощью Гугл Переводчика'
+        try:
+            loop = asyncio.get_event_loop()
+            translate_partial = partial(GoogleTranslator(src, dest).translate, msg)
+            msg_ru = await loop.run_in_executor(None, translate_partial)
+            return f'{msg_ru}\n\n____________________________\nПереведено с помощью Гугл Переводчика'
+        except TooManyRequests:
+            print("Too many requests to the server. Waiting before retrying...")
+            await asyncio.sleep(5)
+            return translate_ru(src)
 
     async def translate_en(src: str, msg: str = msg, dest: str = 'en') -> str:
-        loop = asyncio.get_event_loop()
-        translate_partial = partial(GoogleTranslator(src, dest).translate, msg)
-        msg_en = await loop.run_in_executor(None, translate_partial)
-        return f'{msg_en}\n\n____________________________\nTranslated using Google Translator'
+        try:
+            loop = asyncio.get_event_loop()
+            translate_partial = partial(GoogleTranslator(src, dest).translate, msg)
+            msg_en = await loop.run_in_executor(None, translate_partial)
+            return f'{msg_en}\n\n____________________________\nTranslated using Google Translator'
+        except TooManyRequests:
+            print("Too many requests to the server. Waiting before retrying...")
+            await asyncio.sleep(5)
+            return translate_ru(src)
 
     async def translate_el(src: str, msg: str = msg, dest: str = 'el') -> str:
-        loop = asyncio.get_event_loop()
-        translate_partial = partial(GoogleTranslator(src, dest).translate, msg)
-        msg_el = await loop.run_in_executor(None, translate_partial)
-        return f'{msg_el}\n\n____________________________\nΜεταφράστηκε χρησιμοποιώντας το Google Translator'
+        try:
+            loop = asyncio.get_event_loop()
+            translate_partial = partial(GoogleTranslator(src, dest).translate, msg)
+            msg_el = await loop.run_in_executor(None, translate_partial)
+            return f'{msg_el}\n\n____________________________\nΜεταφράστηκε χρησιμοποιώντας το Google Translator'
+        except TooManyRequests:
+            print("Too many requests to the server. Waiting before retrying...")
+            await asyncio.sleep(5)
+            return translate_ru(src)
 
     msg_language = await detect_language(msg)
 
